@@ -34,7 +34,7 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 		return err
 	}
 
-	branchDirName := strings.Replace(currentBranch, "/", "_", 0)
+	branchDirName := strings.ReplaceAll(currentBranch, "/", "_")
 	dirLocation := filepath.Join(notesDir, branchDirName)
 
 	fmt.Println("Your current branch is: ", currentBranch)
