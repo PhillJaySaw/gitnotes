@@ -42,7 +42,8 @@ func initConfig() (*Config, error) {
 			return nil, err
 		}
 
-		_, err = fmt.Fprintln(configFile, `notes_dir = "~/gitnotes/notes"`)
+		s := fmt.Sprintf(`notes_dir = "%s/gitnotes/notes"`, homedir)
+		_, err = fmt.Fprintln(configFile, s)
 		if err != nil {
 			return nil, err
 		}

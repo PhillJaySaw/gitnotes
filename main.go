@@ -12,6 +12,9 @@ func main() {
 		fmt.Println(err)
 	}
 
-	fmt.Println(config)
-	fmt.Println(config.NotesDir)
+	err = createNotesDirForCurrentBranch(config.NotesDir)	
+
+	if err != nil {
+		fmt.Println(err)
+	}
 }

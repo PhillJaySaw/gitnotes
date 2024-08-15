@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -26,17 +27,20 @@ func getCurrentBranchName() (string, error) {
 	return strings.TrimSpace(branchName), nil
 }
 
-func createNotesDirForCurrentBranch() error {
+func createNotesDirForCurrentBranch(notesDir string) error {
 	currentBranch, err := getCurrentBranchName()
 
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Your current branch is: ", currentBranch)
-	fmt.Println("I will try to create a dir for it")
+	branchDirName := strings.Replace(currentBranch, "/", "_", 0)
+	dirLocation := filepath.Join(notesDir, branchDirName)
 
-	err = os.Mkdir(currentBranch, 0755)
+	fmt.Println("Your current branch is: ", currentBranch)
+	fmt.Println("I will try to create a directory for it at", dirLocation)
+
+	err = os.MkdirAll(dirLocation, 0755)
 
 	if err != nil {
 		return err
