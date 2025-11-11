@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 )
@@ -27,6 +28,20 @@ func getCurrentBranchName() (string, error) {
 	return strings.TrimSpace(branchName), nil
 }
 
+func getProjectName() (string, error) {
+	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
+	output, err := cmd.Output()
+
+	if err != nil {
+		return "", err
+	}
+
+	projectPath := strings.TrimSpace(string(output))
+	result := filepath.Base((projectPath))
+
+	return result, nil
+}
+
 func createNotesDirForCurrentBranch(notesDir string) error {
 	currentBranch, err := getCurrentBranchName()
 
@@ -34,8 +49,14 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 		return err
 	}
 
+	projectName, err := getProjectName()
+
+	if err != nil {
+		return err
+	}
+
 	branchDirName := strings.ReplaceAll(currentBranch, "/", "_")
-	dirLocation := filepath.Join(notesDir, branchDirName)
+	dirLocation := filepath.Join(notesDir, projectName, branchDirName)
 
 	fmt.Println("Your current branch is: ", currentBranch)
 	fmt.Println("I will try to create a directory for it at", dirLocation)
