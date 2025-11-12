@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"text/template"
 )
 
 func getCurrentBranchName() (string, error) {
@@ -42,6 +44,11 @@ func getProjectName() (string, error) {
 	return result, nil
 }
 
+type NoteTemplate struct {
+	ProjectName string
+	BranchName  string
+}
+
 func createNotesDirForCurrentBranch(notesDir string) error {
 	currentBranch, err := getCurrentBranchName()
 
@@ -56,16 +63,54 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 	}
 
 	branchDirName := strings.ReplaceAll(currentBranch, "/", "_")
-	dirLocation := filepath.Join(notesDir, projectName, branchDirName)
+	branchNotesDirLocation := filepath.Join(notesDir, projectName, branchDirName)
+	branchNotesFileLocation := filepath.Join(branchNotesDirLocation, "notes.md")
 
 	fmt.Println("Your current branch is: ", currentBranch)
-	fmt.Println("I will try to create a directory for it at", dirLocation)
 
-	err = os.MkdirAll(dirLocation, 0755)
+	if _, err := os.Stat(branchNotesFileLocation); errors.Is(err, os.ErrNotExist) {
+		fmt.Println("Note file not found, I will try to create it in", branchNotesDirLocation)
 
-	if err != nil {
-		return err
+		err = os.MkdirAll(branchNotesDirLocation, 0755)
+
+		if err != nil {
+			return err
+		}
+
+		noteTemplateLocation := filepath.Join(notesDir, projectName, "NOTE_TEMPLATE.md")
+
+		noteTemplate, err := os.ReadFile(noteTemplateLocation)
+
+		if err != nil {
+			return err
+		}
+
+		templateString := string(noteTemplate[:])
+		templateArgs := NoteTemplate{projectName, currentBranch}
+
+		tmpl, err := template.New("note").Parse(templateString)
+
+		if err != nil {
+			return err
+		}
+
+		var buf bytes.Buffer
+		err = tmpl.Execute(&buf, templateArgs)
+
+		if err != nil {
+			return err
+		}
+
+		err = os.WriteFile(branchNotesFileLocation, buf.Bytes(), 0664)
+
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
+
+	fmt.Println("You already have a note for this branch in", branchNotesFileLocation)
 
 	return nil
 }
