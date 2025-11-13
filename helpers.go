@@ -62,9 +62,9 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 		return err
 	}
 
-	branchDirName := strings.ReplaceAll(currentBranch, "/", "_")
-	branchNotesDirLocation := filepath.Join(notesDir, projectName, branchDirName)
-	branchNotesFileLocation := filepath.Join(branchNotesDirLocation, "notes.md")
+	branchFileName := strings.ReplaceAll(currentBranch, "/", "_") + ".md"
+	branchNotesDirLocation := filepath.Join(notesDir, projectName)
+	branchNotesFileLocation := filepath.Join(branchNotesDirLocation, branchFileName)
 
 	fmt.Println("Your current branch is: ", currentBranch)
 
