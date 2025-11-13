@@ -80,12 +80,18 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 		noteTemplateLocation := filepath.Join(notesDir, projectName, "NOTE_TEMPLATE.md")
 
 		noteTemplate, err := os.ReadFile(noteTemplateLocation)
+		var templateString string
 
-		if err != nil {
+		if os.IsNotExist(err) {
+			fmt.Println("No NOTE_TEMPLATE.md file found, creating notes file from default template")
+			templateString = "# {{.ProjectName}} - {{.BranchName}}"
+		} else if err != nil {
 			return err
+		} else {
+			fmt.Println("Creating note file from template found in branch dir")
+			templateString = string(noteTemplate[:])
 		}
 
-		templateString := string(noteTemplate[:])
 		templateArgs := NoteTemplate{projectName, currentBranch}
 
 		tmpl, err := template.New("note").Parse(templateString)
@@ -103,6 +109,8 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 
 		err = os.WriteFile(branchNotesFileLocation, buf.Bytes(), 0664)
 
+		fmt.Println("Note file created in", branchNotesDirLocation)
+
 		if err != nil {
 			return err
 		}
@@ -110,7 +118,7 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 		return nil
 	}
 
-	fmt.Println("You already have a note for this branch in", branchNotesFileLocation)
+	fmt.Println("You already have a note for this branch in", branchNotesDirLocation)
 
 	return nil
 }
