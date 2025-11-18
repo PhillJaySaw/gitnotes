@@ -3,54 +3,46 @@
 ## user flow
 
 1. create new branch in git project
-2. git notes automatically creates a notes file based on config
+2. git notes automatically creates a notes file based on config after executing `gitnotes` command
 
 ## config
 
-- notes template
-- location of notes dir
-- locations of projects to listen to
-
+The config will be created when gitnotes is execute for the first time, if it does not exist.
+The location of the config is `~/.config/gitnotes`. For now the only thing that this file configures is the location of the notes dir used by `gitnotes` (default is set to `~/gitnotes/notes`).    
 
 ## notes dir structure
 
-| notes dir
-|\ wip (work in progress, working branches)
-| | project name
-| |\ branch_name_1.md
-| | project name
-| |\ branch_name_1.md
-| |\ branch_name_2.md
-| |\ branch_name_2.md
-|
-|\
-| | project name
-| |\ branch_name_1.md
-| |\ branch_name_2.md
-|
-|\ archive (notes archive for completed branches)
+gitnotes/
+    notes/
+        project-1/
+            branch-name.md
+            branch2-name.md
+            branch3-name.md
+        project-2/
+            branch-name.md
+            branch2-name.md
+        project-3/
 
 
 ## features
 
-- set status in note file to auto archive (write DONE at the top for example)
-- runs in the background
-- execute command in project dir to automatically listen for branch changes and new notes
+### implemented 
 
-## milestones / brainstorm
+- create notes file for a specific branch in notes folder
+- add custom NOTE_TEMPLATE.md file which can be use when creating notes for a project
 
-- [ ] figure out a way to detect branch checkouts in repo
-- [ ] figure out a way for git-notes to run in the background without having to launch it each time
-- [ ] which git projects should be watche? config? maybe running command in project to start listening to it
-- [ ] what if you checkout someone elses branch, should it be ignored? how to detect this?
-- [ ] create notes files based on templates in config 
-- [ ] search capability for notes based on content/branch name/commits
-- [ ] maybe there could be a section in the notes which is being updated with changes made to the branch
-- [ ] different note types based on branch template 'feature/...', 'test/...', etc.
+### no implemented 
+
+- set status in note file to auto archive (ex. write DONE at the top of the note)
+- runs in the background, no need to run command in git repo, note will be created automagically when branch is created
+- add more command for listing all notes, listing notes in project
+- different notes for different branch types (ex. `feature/branch`, `bugfix/branch`)
+- update note with info/metadata about the branch, like commits, dates etc. 
+- improved logging with `github.com/charmbracelet/log`
 
 ## POC
 
-- [ ] go project
-- [ ] run go program in repo
-- [ ] read basic setup from config file in `./.config/git-notes.config`
+- [x] go project
+- [x] run go program in repo
+- [x] read basic setup from config file in `./.config/git-notes.config`
 - [ ] detect branch changes 
