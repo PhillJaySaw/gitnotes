@@ -3,12 +3,13 @@ package main
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"github.com/philljaysaw/gitnotes/logger"
 )
 
 func getCurrentBranchName() (string, error) {
@@ -51,6 +52,7 @@ type NoteTemplate struct {
 
 func createNotesDirForCurrentBranch(notesDir string) error {
 	currentBranch, err := getCurrentBranchName()
+	log := logger.New()
 
 	if err != nil {
 		return err
@@ -66,10 +68,10 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 	branchNotesDirLocation := filepath.Join(notesDir, projectName)
 	branchNotesFileLocation := filepath.Join(branchNotesDirLocation, branchFileName)
 
-	fmt.Println("Your current branch is: ", currentBranch)
+	log.Info("Your current branch is: " + currentBranch)
 
 	if _, err := os.Stat(branchNotesFileLocation); errors.Is(err, os.ErrNotExist) {
-		fmt.Println("Note file not found, I will try to create it in", branchNotesDirLocation)
+		log.Info("Note file not found, I will try to create it in " + branchNotesDirLocation)
 
 		err = os.MkdirAll(branchNotesDirLocation, 0755)
 
@@ -83,12 +85,12 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 		var templateString string
 
 		if os.IsNotExist(err) {
-			fmt.Println("No NOTE_TEMPLATE.md file found, creating notes file from default template")
+			log.Warn("No NOTE_TEMPLATE.md file found, creating notes file from default template")
 			templateString = "# {{.ProjectName}} - {{.BranchName}}"
 		} else if err != nil {
 			return err
 		} else {
-			fmt.Println("Creating note file from template found in branch dir")
+			log.Info("Creating note file from template found in branch dir")
 			templateString = string(noteTemplate[:])
 		}
 
@@ -109,7 +111,7 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 
 		err = os.WriteFile(branchNotesFileLocation, buf.Bytes(), 0664)
 
-		fmt.Println("Note file created in", branchNotesDirLocation)
+		log.Info("Note file created in " + branchNotesDirLocation)
 
 		if err != nil {
 			return err
@@ -118,7 +120,7 @@ func createNotesDirForCurrentBranch(notesDir string) error {
 		return nil
 	}
 
-	fmt.Println("You already have a note for this branch in", branchNotesDirLocation)
+	log.Info("You already have a note for this branch in " + branchNotesDirLocation)
 
 	return nil
 }

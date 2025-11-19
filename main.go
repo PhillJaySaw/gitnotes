@@ -1,14 +1,14 @@
 package main
 
-import (
-	"fmt"
-)
+import "github.com/philljaysaw/gitnotes/logger"
 
 func init() {
-	fmt.Println("Initalizing GitNotes")
+	log := logger.New()
+	log.Info("Initalizing GitNotes")
 }
 
 func main() {
+	log := logger.New()
 
 	// TODO handle `gitnotes` - create note for branch
 
@@ -19,13 +19,14 @@ func main() {
 	config, err := initConfig()
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
 		return
 	}
 
 	err = createNotesDirForCurrentBranch(config.NotesDir)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Error(err)
+		return
 	}
 }

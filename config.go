@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
+	"github.com/philljaysaw/gitnotes/logger"
 )
 
 type Config struct {
@@ -16,7 +17,9 @@ const CONFIG_LOCATION = ".config/gitnote"
 const CONFIG_FILE_NAME = "gitnotes.toml"
 
 func initConfig() (*Config, error) {
+	log := logger.New()
 	homedir, err := os.UserHomeDir()
+
 	if err != nil {
 		return nil, err
 	}
@@ -27,8 +30,7 @@ func initConfig() (*Config, error) {
 	_, err = os.Stat(fullPathToConfigFile)
 
 	if os.IsNotExist(err) {
-		fmt.Println("No config file found, creating one in " + fullPathToConfigDir)
-		fmt.Println()
+		log.Info("No config file found, creating one in " + fullPathToConfigDir)
 
 		err = os.MkdirAll(fullPathToConfigDir, 0755)
 
@@ -53,8 +55,7 @@ func initConfig() (*Config, error) {
 			return nil, err
 		}
 
-		fmt.Println("Config created successfully")
-		fmt.Println()
+		log.Info("Config created successfully")
 	}
 
 	var config Config
